@@ -1,5 +1,3 @@
-//jshint ignore: start
-
 pragma solidity ^0.4.24;
 
 contract HelloWorld {
@@ -10,6 +8,7 @@ contract HelloWorld {
         owner = msg.sender; // Deployer of contract
     }
 
+    // Log string
     event Hello(string _msg);
 
     modifier onlyOwner {
