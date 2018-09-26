@@ -2,6 +2,7 @@
 const Mambler = artifacts.require('./Mambler.sol')
 const Web3 = require('web3')
 var web3 = new Web3('http://localhost:9545');
+const BN = web3.utils.BN
 
 
 // Tests
@@ -10,8 +11,8 @@ contract('Mambler Contract tests', async accounts => {
   const alice = accounts[0]
   const bob = accounts[1]
   const carol = accounts[2]
-  const bobBetAmount = 10000000
-  const carolBetAmount = 20000000
+  const bobBetAmount = new BN(100000000)
+  const carolBetAmount = new BN(200000000)
   let gasUsed, gasPrice, betTxHash
 
   it('should be deployed, Mambler', async () => {
@@ -41,9 +42,9 @@ contract('Mambler Contract tests', async accounts => {
       assert(false, e)
     }
 
-    const txFee = gasUsed * gasPrice
+    const txFee = web3.utils.toBN(gasUsed * gasPrice)
 
-    const balance1 = await web3.eth.getBalance(bob)
+    const balance1 = new BN(await web3.eth.getBalance(bob))
 
     try {
       await mambler.claimPrize({ from: bob })
@@ -51,9 +52,9 @@ contract('Mambler Contract tests', async accounts => {
       assert(false, e)
     }
     
-    const balance2 = await web3.eth.getBalance(bob)
+    const balance2 = new BN(await web3.eth.getBalance(bob))
 
-    assert(balance1 === (balance2 + bobBetAmount + carolBetAmount - txFee), 'account did not receive correct prize amount')
+    assert(balance2.cmp(balance1.add(carolBetAmount).sub(txFee)) === 0, 'account did not receive correct prize amount')
   })
 
   it('errors if msg.value is zero', async () => {
