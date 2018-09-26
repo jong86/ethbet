@@ -11,15 +11,13 @@ contract Mambler is Ownable {
     }
 
     struct RoundInfo {
-        uint block;
         uint totalAmount;
         uint totalBets;
-        address miner;
     }
 
     mapping (uint => RoundInfo) public blockToRoundInfo;
 
-    mapping (uint => mapping (address => Bet)) public bets;
+    mapping (uint => mapping (address => Bet)) public blockToAddressToBet;
 
     modifier valueGreaterThanZero() {
         if (msg.value < 1) {
@@ -33,11 +31,17 @@ contract Mambler is Ownable {
         // Bets are always for the next block
         uint nextBlock = block.number + 1;
         Bet memory _bet = Bet(msg.sender, _miner, msg.value, nextBlock, false);
-        bets[nextBlock][msg.sender] = _bet;
+        blockToAddressToBet[nextBlock][msg.sender] = _bet;
+
+        // Store the round info
+        blockToRoundInfo[nextBlock].totalAmount += msg.value;
+        blockToRoundInfo[nextBlock].totalBets += 1;
     }
 
     function claimPrize() public {
         // Bets can only be claimed during the block the bet was for
-
+        if (blockToAddressToBet[block.number][msg.sender].miner == block.coinbase) {
+            msg.sender.transfer(blockToRoundInfo[block.number].totalAmount / blockToRoundInfo[block.number].totalBets);
+        }
     }
 }
