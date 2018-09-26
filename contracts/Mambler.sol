@@ -36,8 +36,8 @@ contract Mambler is Ownable {
         bets[nextBlock][msg.sender] = _bet;
     }
 
-    // function claimPrize() public {
-    //     // Bets can only be claimed during the block the bet was for
+    function claimPrize() public {
+        // Bets can only be claimed during the block the bet was for
 
-    // }
+    }
 }
